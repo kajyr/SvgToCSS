@@ -8,8 +8,8 @@ Mustache = 	require 'mustache'
 defaults = {
 	base64: false,
 	cwd: './',
-	templateCSS: './templateCSS.mst',
-	templateSASS: './templateSASS.mst',
+	templateCSS: "#{__dirname}/templateCSS.mst",
+	templateSASS: "#{__dirname}/templateSASS.mst",
 	dest: 'svg.css'
 	style: 'css'
 }
