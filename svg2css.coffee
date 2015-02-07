@@ -15,6 +15,17 @@ _extend = (object, properties) ->
 	for key, val of properties
 		object[key] = val
 	object
+_write = (files, cwd, dest, cb) ->
+	rendered = (for file in files
+				file.render()).join('\n')
+
+	mkdirp(cwd, (err) ->
+		throw err if err
+
+		filename = "#{cwd}#{dest}"
+		fs.writeFileSync(filename, rendered)
+		cb.apply(null) if typeof cb == 'function'
+	)
 
 class SVGFile
 	constructor: (@name, @data, options) ->
@@ -39,17 +50,6 @@ class SVGFile
 			base64: @options.base64 == true
 		})
 
-_write = (files, cwd, dest, cb) ->
-	rendered = (for file in files
-				file.render()).join('\n')
-
-	mkdirp(cwd, (err) ->
-		throw err if err
-
-		filename = "#{cwd}#{dest}"
-		fs.writeFileSync(filename, rendered)
-		cb.apply(null) if typeof cb == 'function'
-	)
 
 module.exports = {
 

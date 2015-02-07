@@ -25,6 +25,30 @@
     return object;
   };
 
+  _write = function(files, cwd, dest, cb) {
+    var file, rendered;
+    rendered = ((function() {
+      var _i, _len, _results;
+      _results = [];
+      for (_i = 0, _len = files.length; _i < _len; _i++) {
+        file = files[_i];
+        _results.push(file.render());
+      }
+      return _results;
+    })()).join('\n');
+    return mkdirp(cwd, function(err) {
+      var filename;
+      if (err) {
+        throw err;
+      }
+      filename = "" + cwd + dest;
+      fs.writeFileSync(filename, rendered);
+      if (typeof cb === 'function') {
+        return cb.apply(null);
+      }
+    });
+  };
+
   SVGFile = (function() {
     function SVGFile(name, data, options) {
       this.name = name;
@@ -60,30 +84,6 @@
     return SVGFile;
 
   })();
-
-  _write = function(files, cwd, dest, cb) {
-    var file, rendered;
-    rendered = ((function() {
-      var _i, _len, _results;
-      _results = [];
-      for (_i = 0, _len = files.length; _i < _len; _i++) {
-        file = files[_i];
-        _results.push(file.render());
-      }
-      return _results;
-    })()).join('\n');
-    return mkdirp(cwd, function(err) {
-      var filename;
-      if (err) {
-        throw err;
-      }
-      filename = "" + cwd + dest;
-      fs.writeFileSync(filename, rendered);
-      if (typeof cb === 'function') {
-        return cb.apply(null);
-      }
-    });
-  };
 
   module.exports = {
     encode: function(files, options, callback) {
