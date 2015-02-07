@@ -2,29 +2,10 @@ var svg2css = require('../svg2css.js');
 var fs = require('fs');
 
 var svgFixture = './test/fixtures/iconmonstr-barcode-4-icon.svg';
-var expectedCSS = './test/expected/iconmonstr-barcode-4-icon.css';
+var svgFixture2 = './test/fixtures/iconmonstr-puzzle-2-icon.svg';
 
-
-exports.basicEncode = function (test) {
-   
-	var fileContents = fs.readFileSync(svgFixture, 'utf8')
-
-		svg2css.encodeString('svgFromStringToURI', fileContents, {
-			cwd: 'test/expected/'
-		}, function (encoded) {
-			test.notEqual(fileContents, encoded, 'Encoded URI data should be different from original');
-			
-			svg2css.encodeString('svgFromStringToB64', fileContents, {
-				cwd: 'test/expected/',
-				base64: true
-			}, function(base64) {
-				test.notEqual(fileContents, base64, 'Encoded Base64 data should be different from original');
-				test.notEqual(encoded, base64, 'Encoded Base64 data should be different from URI Encoded');
-			
-				test.done();
-			});
-		})
-}
+var cssDir = './test/expected/';
+var expectedCSS = cssDir + '/svg.css';
 
 /*
 	Tests that when working with already present svgData, the css is created
@@ -32,10 +13,10 @@ exports.basicEncode = function (test) {
 exports.fileFromString = function (test) {
 
 	var svgName = 'testFileFromString';
-	var cssDir = 'test/expected/';
+	
 	var expectedCSS = cssDir + svgName + '.css';
    
-	var fileContents = fs.readFileSync(svgFixture, 'utf8');
+	var fileContents = fs.readFileSync(svgFixture2, 'utf8');
 
 	svg2css.encodeString(svgName, fileContents, {
 		cwd: cssDir
@@ -50,12 +31,20 @@ exports.fileFromString = function (test) {
 }
 
 exports.fileEncode = function (test) {	
-	svg2css.encodeFile(svgFixture, {
-		cwd: 'test/expected/'
-	}, function(data) {
-		test.notEqual(data.length, 0, 'There is some data returned.');
-		test.strictEqual(typeof(data), 'string', 'The return value is a string');
+	svg2css.encode([svgFixture], {
+		cwd: cssDir
+	}, function() {
+		fs.exists(expectedCSS, function (exists) {
+			test.ok(exists, 'There should be the css file');
+			test.done();
+		});
+	})
+}
 
+exports.multiFileEncode = function (test) {	
+	svg2css.encode([svgFixture, svgFixture2], {
+		cwd: cssDir
+	}, function() {
 		fs.exists(expectedCSS, function (exists) {
 			test.ok(exists, 'There should be the css file');
 			test.done();

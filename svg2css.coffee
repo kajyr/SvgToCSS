@@ -1,11 +1,14 @@
 fs = require('fs')
 path = require('path')
 mkdirp = require('mkdirp')
+Mustache = require('mustache')
 
 # Defaults
 defaults = {
 	base64: false,
-	cwd: './'
+	cwd: './',
+	template: './templateCSS.mst',
+	dest: 'svg.css'
 }
 
 _extend = (object, properties) ->
@@ -13,47 +16,59 @@ _extend = (object, properties) ->
 		object[key] = val
 	object
 
-_encode = (svg, base64) ->
-	if base64 == true
-		return new Buffer(svg).toString('base64')
-	return encodeURIComponent(svg)
+class SVGFile
+	constructor: (@name, @data, options) ->
+		@options = _extend(defaults, options)
+		@encoded = @_encode()
 
-_toFile = (svgName, svgData, cwd, cb) ->
+	@fromFile: (filename, options) ->
+		data = fs.readFileSync(filename, 'utf8')
+		name = path.basename(filename, '.svg')
+		new SVGFile(name, data, options)
+
+	_encode: () ->
+		if @options.base64 == true
+			return new Buffer(@data).toString('base64')
+		return encodeURIComponent(@data)
+
+	render: () ->
+		template = fs.readFileSync(@options.template, 'utf8')
+		Mustache.render(template, {
+			svgName: @name,
+			svgEncoded: @encoded
+			base64: @options.base64 == true
+		})
+
+_write = (files, cwd, dest, cb) ->
+	rendered = (for file in files
+				file.render()).join('\n')
+
 	mkdirp(cwd, (err) ->
-		throw err if err	
-		filename = "#{cwd}#{svgName}.css"
-		fs.writeFileSync(filename, svgData)
+		throw err if err
 
-		cb.apply()
+		filename = "#{cwd}#{dest}"
+		fs.writeFileSync(filename, rendered)
+		cb.apply(null) if typeof cb == 'function'
 	)
-	
-_svgToCss = (svgName, svgData, options, cb) ->
-	encoded = _encode(svgData, options.base64)
-
-	_toFile(svgName, encoded, options.cwd, () ->
-		cb.apply(null, [encoded]) if typeof cb == 'function'
-	)
-
 
 module.exports = {
-	
-	encodeFile: (filename, options, callback) ->
+
+	encode: (files, options, callback) ->
 		options = _extend(defaults, options)
-		svgName = path.basename(filename, '.svg')
-		
-		fs.readFile(filename, 'utf8', (err, svgData) ->
-			throw err if err
 
-			_svgToCss(svgName, svgData, options, (encodedSvg) ->
-				callback.apply(null, [encodedSvg]) if typeof callback == 'function'
+		svgFiles = for file in files
+			SVGFile.fromFile(file, options)
+
+		_write(svgFiles, options.cwd, options.dest, () ->
+				callback.apply(null) if typeof callback == 'function'
 			)
-
-			
-		)
 
 	encodeString: (svgName, svgData, options, callback) ->
 		options = _extend(defaults, options)
-		_svgToCss(svgName, svgData, options, (encodedSvg) ->
-			callback.apply(null, [encodedSvg]) if typeof callback == 'function'
+
+		file = new SVGFile(svgName, svgData, options)
+
+		_write([file], options.cwd, file.name + '.css', () ->
+			callback.apply(null) if typeof callback == 'function'
 		)
 }

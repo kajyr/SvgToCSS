@@ -1,5 +1,5 @@
 (function() {
-  var defaults, fs, mkdirp, path, _encode, _extend, _svgToCss, _toFile;
+  var Mustache, SVGFile, defaults, fs, mkdirp, path, _extend, _write;
 
   fs = require('fs');
 
@@ -7,9 +7,13 @@
 
   mkdirp = require('mkdirp');
 
+  Mustache = require('mustache');
+
   defaults = {
     base64: false,
-    cwd: './'
+    cwd: './',
+    template: './templateCSS.mst',
+    dest: 'svg.css'
   };
 
   _extend = function(object, properties) {
@@ -21,56 +25,92 @@
     return object;
   };
 
-  _encode = function(svg, base64) {
-    if (base64 === true) {
-      return new Buffer(svg).toString('base64');
+  SVGFile = (function() {
+    function SVGFile(name, data, options) {
+      this.name = name;
+      this.data = data;
+      this.options = _extend(defaults, options);
+      this.encoded = this._encode();
     }
-    return encodeURIComponent(svg);
-  };
 
-  _toFile = function(svgName, svgData, cwd, cb) {
+    SVGFile.fromFile = function(filename, options) {
+      var data, name;
+      data = fs.readFileSync(filename, 'utf8');
+      name = path.basename(filename, '.svg');
+      return new SVGFile(name, data, options);
+    };
+
+    SVGFile.prototype._encode = function() {
+      if (this.options.base64 === true) {
+        return new Buffer(this.data).toString('base64');
+      }
+      return encodeURIComponent(this.data);
+    };
+
+    SVGFile.prototype.render = function() {
+      var template;
+      template = fs.readFileSync(this.options.template, 'utf8');
+      return Mustache.render(template, {
+        svgName: this.name,
+        svgEncoded: this.encoded,
+        base64: this.options.base64 === true
+      });
+    };
+
+    return SVGFile;
+
+  })();
+
+  _write = function(files, cwd, dest, cb) {
+    var file, rendered;
+    rendered = ((function() {
+      var _i, _len, _results;
+      _results = [];
+      for (_i = 0, _len = files.length; _i < _len; _i++) {
+        file = files[_i];
+        _results.push(file.render());
+      }
+      return _results;
+    })()).join('\n');
     return mkdirp(cwd, function(err) {
       var filename;
       if (err) {
         throw err;
       }
-      filename = "" + cwd + svgName + ".css";
-      fs.writeFileSync(filename, svgData);
-      return cb.apply();
-    });
-  };
-
-  _svgToCss = function(svgName, svgData, options, cb) {
-    var encoded;
-    encoded = _encode(svgData, options.base64);
-    return _toFile(svgName, encoded, options.cwd, function() {
+      filename = "" + cwd + dest;
+      fs.writeFileSync(filename, rendered);
       if (typeof cb === 'function') {
-        return cb.apply(null, [encoded]);
+        return cb.apply(null);
       }
     });
   };
 
   module.exports = {
-    encodeFile: function(filename, options, callback) {
-      var svgName;
+    encode: function(files, options, callback) {
+      var file, svgFiles;
       options = _extend(defaults, options);
-      svgName = path.basename(filename, '.svg');
-      return fs.readFile(filename, 'utf8', function(err, svgData) {
-        if (err) {
-          throw err;
+      svgFiles = (function() {
+        var _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = files.length; _i < _len; _i++) {
+          file = files[_i];
+          _results.push(SVGFile.fromFile(file, options));
         }
-        return _svgToCss(svgName, svgData, options, function(encodedSvg) {
-          if (typeof callback === 'function') {
-            return callback.apply(null, [encodedSvg]);
-          }
-        });
+        return _results;
+      })();
+      return _write(svgFiles, options.cwd, options.dest, function() {
+        if (typeof callback === 'function') {
+          return callback.apply(null);
+        }
       });
     },
     encodeString: function(svgName, svgData, options, callback) {
+      var file;
       options = _extend(defaults, options);
-      return _svgToCss(svgName, svgData, options, function(encodedSvg) {
+      file = new SVGFile(svgName, svgData, options);
+      return _write([file], options.cwd, file.name + '.css', function() {
         if (typeof callback === 'function') {
-          return callback.apply(null, [encodedSvg]);
+          return callback.apply(null);
         }
       });
     }
