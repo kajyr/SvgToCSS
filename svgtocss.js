@@ -14,8 +14,10 @@
   defaults = {
     base64: false,
     cwd: './',
-    template: './templateCSS.mst',
-    dest: 'svg.css'
+    templateCSS: './templateCSS.mst',
+    templateSASS: './templateSASS.mst',
+    dest: 'svg.css',
+    style: 'css'
   };
 
   _extend = function(object, properties) {
@@ -79,10 +81,12 @@
       return encodeURIComponent(this.data);
     };
 
+    SVGFile.prototype.template = function() {
+      return fs.readFileSync(this.options.style === 'css' ? this.options.templateCSS : this.options.templateSASS, 'utf8');
+    };
+
     SVGFile.prototype.render = function() {
-      var template;
-      template = fs.readFileSync(this.options.template, 'utf8');
-      return Mustache.render(template, {
+      return Mustache.render(this.template(), {
         svgName: this.name,
         svgEncoded: this.encoded,
         base64: this.options.base64 === true,

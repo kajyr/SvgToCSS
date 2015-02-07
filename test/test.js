@@ -51,3 +51,19 @@ exports.multiFileEncode = function (test) {
 		});
 	})
 }
+
+exports.multiFileEncodeSass = function (test) {
+	var file = '_svg.scss';
+	var expectedSASS = cssDir + file;
+
+	svg2css.encode([svgFixture, svgFixture2], {
+		cwd: cssDir,
+		style: 'sass',
+		dest: file
+	}, function() {
+		fs.exists(expectedSASS, function (exists) {
+			test.ok(exists, 'There should be the SASS file');
+			test.done();
+		});
+	})
+}

@@ -8,14 +8,17 @@ Mustache = 	require 'mustache'
 defaults = {
 	base64: false,
 	cwd: './',
-	template: './templateCSS.mst',
+	templateCSS: './templateCSS.mst',
+	templateSASS: './templateSASS.mst',
 	dest: 'svg.css'
+	style: 'css'
 }
 
 _extend = (object, properties) ->
 	for key, val of properties
 		object[key] = val
 	object
+
 _write = (files, cwd, dest, cb) ->
 	rendered = (for file in files
 				file.render()).join('\n')
@@ -47,9 +50,14 @@ class SVGFile
 			return new Buffer(@data).toString('base64')
 		return encodeURIComponent(@data)
 
+	template: () ->
+		fs.readFileSync(
+			if @options.style == 'css' then @options.templateCSS
+			else @options.templateSASS
+		 'utf8')
+
 	render: () ->
-		template = fs.readFileSync(@options.template, 'utf8')
-		Mustache.render(template, {
+		Mustache.render(@template(), {
 			svgName: @name,
 			svgEncoded: @encoded
 			base64: @options.base64 == true

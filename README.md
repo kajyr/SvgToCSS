@@ -29,5 +29,5 @@ This task would have created a css file like this
 The options parameter can accept these configs:
 + `base64`: boolean, should compress image in base64? (default: false)
 + `cwd`: string, the directory to output files (default: './')
-+ `template`: string, the mustache template to render che CSS (default: a working one)
++ `style`: string, css or sass. That changes the output syntax.
 + `dest`: string, the file to output. (default: 'svg.css')

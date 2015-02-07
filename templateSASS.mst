@@ -1,0 +1,13 @@
+%svg-common-style {
+	background-repeat: no-repeat;
+}
+
+${{svgName}}-width: {{width}};
+${{svgName}}-height: {{height}};
+
+.svg-{{svgName}} {
+	background-image: url('data:image/svg+xml;charset=utf-8{{#base64}};base64{{/base64}},{{svgEncoded}}');
+	width: ${{svgName}}-width;
+	height: ${{svgName}}-height;
+	@extend %svg-common-style;
+}
