@@ -1,8 +1,11 @@
-fs = require('fs');
+fs = require('fs')
+path = require('path')
+mkdirp = require('mkdirp')
 
 # Defaults
 defaults = {
-	base64: false
+	base64: false,
+	cwd: './'
 }
 
 
@@ -13,21 +16,37 @@ _extend = (object, properties) ->
 	object
 
 _encode = (svg, base64) ->
-	console.log 'encoding b64:', base64
 	if base64 == true
 		return new Buffer(svg).toString('base64')
 	return encodeURIComponent(svg)
+
+_toFile = (svgName, svgData, cwd, cb) ->
+	mkdirp(cwd, (err) ->
+		throw err if err	
+		filename = "#{cwd}#{svgName}.css"
+		fs.writeFileSync(filename, svgData)
+
+		cb.apply()
+	)
+	
+
 
 module.exports = {
 	
 	encodeFile: (filename, options, callback) ->
 		options = _extend(defaults, options)
+		basename = path.basename(filename, '.svg')
+
 		fs.readFile(filename, 'utf8', (err, svgData) ->
 			throw err if err
 
-			ret = _encode(svgData, options.base64)
+			encoded = _encode(svgData, options.base64)
 
-			callback.apply(null, [ret]) if typeof callback == 'function'
+			_toFile(basename, encoded, options.cwd, () ->
+				callback.apply(null, [encoded]) if typeof callback == 'function'
+			)
+
+			
 		)
 
 	encodeString: (svgData, options) ->
