@@ -1,12 +1,24 @@
 {
-  "name": "Svg2CSS",
+  "name": "svgtocss",
   "version": "1.0.0",
   "description": "Converts SVG files and embed them into CSS / SASS",
   "main": "svg2css.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Carlo 'kajyr' <carlo.panzi@gmail.com> (http://kajyr.github.io/)",
+  "author": {
+    "name": "Carlo 'kj'",
+    "email": "carlo.panzi@gmail.com",
+    "url": "http://kajyr.github.io"
+  },
+  "homepage": "https://github.com/kajyr/SvgToCSS",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kajyr/SvgToCSS.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kajyr/SvgToCSS/issues"
+  },
   "license": "ISC",
   "devDependencies": {
     "grunt-contrib-coffee": "^0.12.0",
@@ -19,3 +31,6 @@
     "xml2js": "^0.4.4"
   }
 }
+
+
+
