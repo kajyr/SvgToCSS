@@ -1,0 +1,16 @@
+{
+  "name": "Svg2CSS",
+  "version": "0.0.1",
+  "description": "Converts SVG files and embed them into CSS",
+  "main": "svg2css.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Carlo 'kajyr' <carlo.panzi@gmail.com> (http://kajyr.github.io/)",
+  "license": "ISC",
+  "devDependencies": {
+    "grunt-contrib-coffee": "^0.12.0",
+    "grunt": "^0.4.5",
+    "grunt-contrib-watch": "^0.6.1"
+  }
+}
