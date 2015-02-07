@@ -7,27 +7,49 @@ var expectedCSS = './test/expected/iconmonstr-barcode-4-icon.css';
 
 exports.basicEncode = function (test) {
    
-	fs.readFile(svgFixture, 'utf8', function (err, data) {
-		if (err) throw err;
+	var fileContents = fs.readFileSync(svgFixture, 'utf8')
 
-		var encoded = svg2css.encodeString(data, {
+		svg2css.encodeString('svgFromStringToURI', fileContents, {
 			cwd: 'test/expected/'
-		});
-		var base64 = svg2css.encodeString(data, {
-			cwd: 'test/expected/',
-			base64: true
-		});
-
-		test.notEqual(data, encoded, 'Encoded URI data should be different from original');
-		test.notEqual(data, base64, 'Encoded Base64 data should be different from original');
-		test.notEqual(encoded, base64, 'Encoded Base64 data should be different from URI Encoded');
-		test.done();
-	});
-
+		}, function (encoded) {
+			test.notEqual(fileContents, encoded, 'Encoded URI data should be different from original');
+			
+			svg2css.encodeString('svgFromStringToB64', fileContents, {
+				cwd: 'test/expected/',
+				base64: true
+			}, function(base64) {
+				test.notEqual(fileContents, base64, 'Encoded Base64 data should be different from original');
+				test.notEqual(encoded, base64, 'Encoded Base64 data should be different from URI Encoded');
+			
+				test.done();
+			});
+		})
 }
 
-exports.fileEncode = function (test) {
-	
+/*
+	Tests that when working with already present svgData, the css is created
+*/
+exports.fileFromString = function (test) {
+
+	var svgName = 'testFileFromString';
+	var cssDir = 'test/expected/';
+	var expectedCSS = cssDir + svgName + '.css';
+   
+	var fileContents = fs.readFileSync(svgFixture, 'utf8');
+
+	svg2css.encodeString(svgName, fileContents, {
+		cwd: cssDir
+	}, function () {
+		
+		fs.exists(expectedCSS, function (exists) {
+			test.ok(exists, 'There should be the css file');
+			test.done();
+		});
+
+	})
+}
+
+exports.fileEncode = function (test) {	
 	svg2css.encodeFile(svgFixture, {
 		cwd: 'test/expected/'
 	}, function(data) {
@@ -39,5 +61,4 @@ exports.fileEncode = function (test) {
 			test.done();
 		});
 	})
-
 }

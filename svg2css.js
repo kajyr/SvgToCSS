@@ -1,5 +1,5 @@
 (function() {
-  var defaults, fs, mkdirp, path, _encode, _extend, _toFile;
+  var defaults, fs, mkdirp, path, _encode, _extend, _svgToCss, _toFile;
 
   fs = require('fs');
 
@@ -40,27 +40,39 @@
     });
   };
 
+  _svgToCss = function(svgName, svgData, options, cb) {
+    var encoded;
+    encoded = _encode(svgData, options.base64);
+    return _toFile(svgName, encoded, options.cwd, function() {
+      if (typeof cb === 'function') {
+        return cb.apply(null, [encoded]);
+      }
+    });
+  };
+
   module.exports = {
     encodeFile: function(filename, options, callback) {
-      var basename;
+      var svgName;
       options = _extend(defaults, options);
-      basename = path.basename(filename, '.svg');
+      svgName = path.basename(filename, '.svg');
       return fs.readFile(filename, 'utf8', function(err, svgData) {
-        var encoded;
         if (err) {
           throw err;
         }
-        encoded = _encode(svgData, options.base64);
-        return _toFile(basename, encoded, options.cwd, function() {
+        return _svgToCss(svgName, svgData, options, function(encodedSvg) {
           if (typeof callback === 'function') {
-            return callback.apply(null, [encoded]);
+            return callback.apply(null, [encodedSvg]);
           }
         });
       });
     },
-    encodeString: function(svgData, options) {
+    encodeString: function(svgName, svgData, options, callback) {
       options = _extend(defaults, options);
-      return _encode(svgData, options.base64);
+      return _svgToCss(svgName, svgData, options, function(encodedSvg) {
+        if (typeof callback === 'function') {
+          return callback.apply(null, [encodedSvg]);
+        }
+      });
     }
   };
 

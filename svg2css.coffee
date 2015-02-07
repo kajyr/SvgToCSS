@@ -8,8 +8,6 @@ defaults = {
 	cwd: './'
 }
 
-
-
 _extend = (object, properties) ->
 	for key, val of properties
 		object[key] = val
@@ -29,27 +27,33 @@ _toFile = (svgName, svgData, cwd, cb) ->
 		cb.apply()
 	)
 	
+_svgToCss = (svgName, svgData, options, cb) ->
+	encoded = _encode(svgData, options.base64)
+
+	_toFile(svgName, encoded, options.cwd, () ->
+		cb.apply(null, [encoded]) if typeof cb == 'function'
+	)
 
 
 module.exports = {
 	
 	encodeFile: (filename, options, callback) ->
 		options = _extend(defaults, options)
-		basename = path.basename(filename, '.svg')
-
+		svgName = path.basename(filename, '.svg')
+		
 		fs.readFile(filename, 'utf8', (err, svgData) ->
 			throw err if err
 
-			encoded = _encode(svgData, options.base64)
-
-			_toFile(basename, encoded, options.cwd, () ->
-				callback.apply(null, [encoded]) if typeof callback == 'function'
+			_svgToCss(svgName, svgData, options, (encodedSvg) ->
+				callback.apply(null, [encodedSvg]) if typeof callback == 'function'
 			)
 
 			
 		)
 
-	encodeString: (svgData, options) ->
+	encodeString: (svgName, svgData, options, callback) ->
 		options = _extend(defaults, options)
-		return _encode(svgData, options.base64)
+		_svgToCss(svgName, svgData, options, (encodedSvg) ->
+			callback.apply(null, [encodedSvg]) if typeof callback == 'function'
+		)
 }
