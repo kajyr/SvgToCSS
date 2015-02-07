@@ -1,4 +1,4 @@
-#Svg2CSS
+#SvgToCSS
 
 The idea behind this module came from the work made for [aditollo/grunt-svgzr](https://github.com/aditollo/grunt-svgzr) and this article: http://css-tricks.com/probably-dont-base64-svg/
 
