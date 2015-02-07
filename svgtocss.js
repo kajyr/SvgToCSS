@@ -1,5 +1,5 @@
 (function() {
-  var Mustache, SVGFile, defaults, fs, mkdirp, path, _extend, _write;
+  var Mustache, SVGFile, defaults, fs, mkdirp, parseString, path, _extend, _write;
 
   fs = require('fs');
 
@@ -8,6 +8,8 @@
   mkdirp = require('mkdirp');
 
   Mustache = require('mustache');
+
+  parseString = require('xml2js').parseString;
 
   defaults = {
     base64: false,
@@ -55,6 +57,12 @@
       this.data = data;
       this.options = _extend(defaults, options);
       this.encoded = this._encode();
+      parseString(this.data, (function(_this) {
+        return function(err, result) {
+          _this.width = result.svg.$.width;
+          return _this.height = result.svg.$.height;
+        };
+      })(this));
     }
 
     SVGFile.fromFile = function(filename, options) {
@@ -77,7 +85,9 @@
       return Mustache.render(template, {
         svgName: this.name,
         svgEncoded: this.encoded,
-        base64: this.options.base64 === true
+        base64: this.options.base64 === true,
+        width: this.width,
+        height: this.height
       });
     };
 

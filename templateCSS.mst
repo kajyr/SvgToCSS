@@ -1,4 +1,6 @@
 .svg-{{svgName}} {
 	background-image: url('data:image/svg+xml;charset=utf-8{{#base64}};base64{{/base64}},{{svgEncoded}}');
 	background-repeat: no-repeat;
+	width: {{width}};
+	height: {{height}};
 }

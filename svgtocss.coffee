@@ -1,7 +1,8 @@
-fs = require('fs')
-path = require('path')
-mkdirp = require('mkdirp')
-Mustache = require('mustache')
+fs = require 'fs'
+path = require 'path'
+mkdirp = require 'mkdirp'
+Mustache = 	require 'mustache'
+{parseString} = require 'xml2js'
 
 # Defaults
 defaults = {
@@ -31,6 +32,10 @@ class SVGFile
 	constructor: (@name, @data, options) ->
 		@options = _extend(defaults, options)
 		@encoded = @_encode()
+		parseString(@data, (err, result) =>
+			@width = result.svg.$.width
+			@height = result.svg.$.height
+		)
 
 	@fromFile: (filename, options) ->
 		data = fs.readFileSync(filename, 'utf8')
@@ -48,6 +53,8 @@ class SVGFile
 			svgName: @name,
 			svgEncoded: @encoded
 			base64: @options.base64 == true
+			width: @width
+			height: @height
 		})
 
 
