@@ -1,4 +1,4 @@
-var svg2css = require('../svgtocss.js');
+var svg2css = require('../index.js');
 var fs = require('fs');
 
 var svgFixture = './test/fixtures/iconmonstr-barcode-4-icon.svg';

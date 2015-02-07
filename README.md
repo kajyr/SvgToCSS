@@ -1,10 +1,10 @@
-#SvgToCSS
+# SvgToCSS
 
 The idea behind this module came from the work made for [aditollo/grunt-svgzr](https://github.com/aditollo/grunt-svgzr) and this article: http://css-tricks.com/probably-dont-base64-svg/
 
 I've decided to separate the URI / base64 svg renderer to generate CSS / SCSS from SVG files.
 
-##Usage
+## Usage
 ```javascript
 var svgtocss = require('svgtocss');
 
@@ -24,7 +24,7 @@ This task would have created a css file like this
 }
 ```
 
-##Options
+## Options
 
 The options parameter can accept these configs:
 + `base64`: boolean, should compress image in base64? (default: false)
