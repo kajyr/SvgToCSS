@@ -1,19 +1,36 @@
 fs = require('fs');
 
+# Defaults
+defaults = {
+	base64: false
+}
+
+
+
+_extend = (object, properties) ->
+	for key, val of properties
+		object[key] = val
+	object
+
+_encode = (svg, base64) ->
+	console.log 'encoding b64:', base64
+	if base64 == true
+		return new Buffer(svg).toString('base64')
+	return encodeURIComponent(svg)
 
 module.exports = {
-	encode: (svg, base64) ->
-		if base64 == true
-			return new Buffer(svg).toString('base64');
-
-		return encodeURIComponent(svg);
-	,
-	encodeFile: (filename, base64, callback) ->
-		fs.readFile('fixtures/iconmonstr-barcode-4-icon.svg', 'utf8', (err, data) =>
+	
+	encodeFile: (filename, options, callback) ->
+		options = _extend(defaults, options)
+		fs.readFile(filename, 'utf8', (err, svgData) ->
 			throw err if err
 
-			ret = this.encode(data, base64);
+			ret = _encode(svgData, options.base64)
 
 			callback.apply(null, [ret]) if typeof callback == 'function'
 		)
+
+	encodeString: (svgData, options) ->
+		options = _extend(defaults, options)
+		return _encode(svgData, options.base64)
 }

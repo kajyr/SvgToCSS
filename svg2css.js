@@ -1,28 +1,46 @@
 (function() {
-  var fs;
+  var defaults, fs, _encode, _extend;
 
   fs = require('fs');
 
+  defaults = {
+    base64: false
+  };
+
+  _extend = function(object, properties) {
+    var key, val;
+    for (key in properties) {
+      val = properties[key];
+      object[key] = val;
+    }
+    return object;
+  };
+
+  _encode = function(svg, base64) {
+    console.log('encoding b64:', base64);
+    if (base64 === true) {
+      return new Buffer(svg).toString('base64');
+    }
+    return encodeURIComponent(svg);
+  };
+
   module.exports = {
-    encode: function(svg, base64) {
-      if (base64 === true) {
-        return new Buffer(svg).toString('base64');
-      }
-      return encodeURIComponent(svg);
+    encodeFile: function(filename, options, callback) {
+      options = _extend(defaults, options);
+      return fs.readFile(filename, 'utf8', function(err, svgData) {
+        var ret;
+        if (err) {
+          throw err;
+        }
+        ret = _encode(svgData, options.base64);
+        if (typeof callback === 'function') {
+          return callback.apply(null, [ret]);
+        }
+      });
     },
-    encodeFile: function(filename, base64, callback) {
-      return fs.readFile('fixtures/iconmonstr-barcode-4-icon.svg', 'utf8', (function(_this) {
-        return function(err, data) {
-          var ret;
-          if (err) {
-            throw err;
-          }
-          ret = _this.encode(data, base64);
-          if (typeof callback === 'function') {
-            return callback.apply(null, [ret]);
-          }
-        };
-      })(this));
+    encodeString: function(svgData, options) {
+      options = _extend(defaults, options);
+      return _encode(svgData, options.base64);
     }
   };
 
