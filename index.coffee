@@ -71,7 +71,7 @@ module.exports = {
 	encode: (files, options, callback) ->
 		options = _extend(defaults, options)
 
-		svgFiles = for file in files
+		svgFiles = for file in [].concat(files)
 			SVGFile.fromFile(file, options)
 
 		_write(svgFiles, options.cwd, options.dest, () ->

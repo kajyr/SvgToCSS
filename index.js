@@ -104,10 +104,11 @@
       var file, svgFiles;
       options = _extend(defaults, options);
       svgFiles = (function() {
-        var _i, _len, _results;
+        var _i, _len, _ref, _results;
+        _ref = [].concat(files);
         _results = [];
-        for (_i = 0, _len = files.length; _i < _len; _i++) {
-          file = files[_i];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          file = _ref[_i];
           _results.push(SVGFile.fromFile(file, options));
         }
         return _results;

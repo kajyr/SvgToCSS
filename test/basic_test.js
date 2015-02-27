@@ -31,7 +31,7 @@ exports.fileFromString = function (test) {
 }
 
 exports.fileEncode = function (test) {	
-	svg2css.encode([svgFixture], {
+	svg2css.encode(svgFixture, {
 		cwd: cssDir
 	}, function() {
 		fs.exists(expectedCSS, function (exists) {

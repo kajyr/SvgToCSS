@@ -29,9 +29,9 @@ module.exports = function(grunt) {
 
 	grunt.loadNpmTasks('grunt-contrib-coffee');
 	grunt.loadNpmTasks('grunt-contrib-watch');
-	//grunt.loadNpmTasks('grunt-contrib-nodeunit');
+	grunt.loadNpmTasks('grunt-contrib-nodeunit');
 
-	//grunt.registerTask('test', ['coffee', 'nodeunit']);
+	grunt.registerTask('test', ['coffee', 'nodeunit']);
 
 	// By default, lint and run all tests.
 	grunt.registerTask('default', ['coffee']);
