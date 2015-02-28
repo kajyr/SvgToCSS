@@ -10,7 +10,7 @@ defaults = {
 	cwd: './',
 	templateCSS: "#{__dirname}/templateCSS.mst",
 	templateSCSS: "#{__dirname}/templateSCSS.mst",
-	dest: 'svg.css'
+	spriteFileName: 'svg'
 	style: 'css'
 }
 
@@ -18,6 +18,9 @@ _extend = (object, properties) ->
 	for key, val of properties
 		object[key] = val
 	object
+
+_merge = (options, overrides) ->
+  _extend ( _extend {}, options), overrides
 
 _write = (files, cwd, dest, cb) ->
 	rendered = (for file in files
@@ -31,9 +34,13 @@ _write = (files, cwd, dest, cb) ->
 		cb.apply(null) if typeof cb == 'function'
 	)
 
+_spriteName = (options) ->
+	return options.sprite if options.sprite?
+	ext = options.style.toLowerCase()
+	options.spriteFileName + '.' + ext
+
 class SVGFile
-	constructor: (@name, @data, options) ->
-		@options = _extend(defaults, options)
+	constructor: (@name, @data, @options) ->
 		@encoded = @_encode()
 		parseString(@data, (err, result) =>
 			@width = result.svg.$.width
@@ -69,22 +76,21 @@ class SVGFile
 
 module.exports = {
 
-	encode: (files, options, callback) ->
-		options = _extend(defaults, options)
+	encode: (files, params, callback) ->
+
+		options = _merge(defaults, params)
+
+		spriteName = _spriteName(options)
 
 		svgFiles = for file in [].concat(files)
 			SVGFile.fromFile(file, options)
 
-		_write(svgFiles, options.cwd, options.dest, () ->
-				callback.apply(null) if typeof callback == 'function'
-			)
+		_write(svgFiles, options.cwd, spriteName, callback)
 
-	encodeString: (svgName, svgData, options, callback) ->
-		options = _extend(defaults, options)
+	encodeString: (svgName, svgData, params, callback) ->
+		options = _merge(defaults, params)
 
 		file = new SVGFile(svgName, svgData, options)
 
-		_write([file], options.cwd, file.name + '.css', () ->
-			callback.apply(null) if typeof callback == 'function'
-		)
+		_write([file], options.cwd, file.name + '.css', callback)
 }

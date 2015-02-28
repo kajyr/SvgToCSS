@@ -1,5 +1,5 @@
 (function() {
-  var Mustache, SVGFile, defaults, fs, mkdirp, parseString, path, _extend, _write;
+  var Mustache, SVGFile, defaults, fs, mkdirp, parseString, path, _extend, _merge, _spriteName, _write;
 
   fs = require('fs');
 
@@ -16,7 +16,7 @@
     cwd: './',
     templateCSS: "" + __dirname + "/templateCSS.mst",
     templateSCSS: "" + __dirname + "/templateSCSS.mst",
-    dest: 'svg.css',
+    spriteFileName: 'svg',
     style: 'css'
   };
 
@@ -27,6 +27,10 @@
       object[key] = val;
     }
     return object;
+  };
+
+  _merge = function(options, overrides) {
+    return _extend(_extend({}, options), overrides);
   };
 
   _write = function(files, cwd, dest, cb) {
@@ -53,11 +57,20 @@
     });
   };
 
+  _spriteName = function(options) {
+    var ext;
+    if (options.sprite != null) {
+      return options.sprite;
+    }
+    ext = options.style.toLowerCase();
+    return options.spriteFileName + '.' + ext;
+  };
+
   SVGFile = (function() {
     function SVGFile(name, data, options) {
       this.name = name;
       this.data = data;
-      this.options = _extend(defaults, options);
+      this.options = options;
       this.encoded = this._encode();
       parseString(this.data, (function(_this) {
         return function(err, result) {
@@ -102,9 +115,10 @@
   })();
 
   module.exports = {
-    encode: function(files, options, callback) {
-      var file, svgFiles;
-      options = _extend(defaults, options);
+    encode: function(files, params, callback) {
+      var file, options, spriteName, svgFiles;
+      options = _merge(defaults, params);
+      spriteName = _spriteName(options);
       svgFiles = (function() {
         var _i, _len, _ref, _results;
         _ref = [].concat(files);
@@ -115,21 +129,13 @@
         }
         return _results;
       })();
-      return _write(svgFiles, options.cwd, options.dest, function() {
-        if (typeof callback === 'function') {
-          return callback.apply(null);
-        }
-      });
+      return _write(svgFiles, options.cwd, spriteName, callback);
     },
-    encodeString: function(svgName, svgData, options, callback) {
-      var file;
-      options = _extend(defaults, options);
+    encodeString: function(svgName, svgData, params, callback) {
+      var file, options;
+      options = _merge(defaults, params);
       file = new SVGFile(svgName, svgData, options);
-      return _write([file], options.cwd, file.name + '.css', function() {
-        if (typeof callback === 'function') {
-          return callback.apply(null);
-        }
-      });
+      return _write([file], options.cwd, file.name + '.css', callback);
     }
   };
 
