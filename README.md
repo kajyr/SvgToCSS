@@ -30,4 +30,4 @@ The options parameter can accept these configs:
 + `base64`: boolean, should compress image in base64? (default: false)
 + `cwd`: string, the directory to output files (default: './')
 + `style`: string, css or scss. That changes the output syntax.
-+ `dest`: string, the file to output. (default: 'svg.css')
++ `sprite`: string, the file to output. (default: 'svg.css')
