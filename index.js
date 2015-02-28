@@ -15,7 +15,7 @@
     base64: false,
     cwd: './',
     templateCSS: "" + __dirname + "/templateCSS.mst",
-    templateSASS: "" + __dirname + "/templateSASS.mst",
+    templateSCSS: "" + __dirname + "/templateSCSS.mst",
     dest: 'svg.css',
     style: 'css'
   };
@@ -82,7 +82,9 @@
     };
 
     SVGFile.prototype.template = function() {
-      return fs.readFileSync(this.options.style === 'css' ? this.options.templateCSS : this.options.templateSASS, 'utf8');
+      var style;
+      style = this.options.style.toLowerCase();
+      return fs.readFileSync(style === 'scss' ? this.options.templateSCSS : this.options.templateCSS, 'utf8');
     };
 
     SVGFile.prototype.render = function() {

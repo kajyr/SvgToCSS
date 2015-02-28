@@ -9,7 +9,7 @@ defaults = {
 	base64: false,
 	cwd: './',
 	templateCSS: "#{__dirname}/templateCSS.mst",
-	templateSASS: "#{__dirname}/templateSASS.mst",
+	templateSCSS: "#{__dirname}/templateSCSS.mst",
 	dest: 'svg.css'
 	style: 'css'
 }
@@ -51,9 +51,10 @@ class SVGFile
 		return encodeURIComponent(@data)
 
 	template: () ->
+		style = @options.style.toLowerCase()
 		fs.readFileSync(
-			if @options.style == 'css' then @options.templateCSS
-			else @options.templateSASS
+			if style == 'scss' then @options.templateSCSS
+			else @options.templateCSS
 		 'utf8')
 
 	render: () ->
