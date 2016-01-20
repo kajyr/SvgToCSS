@@ -23,7 +23,7 @@ module.exports = function(grunt) {
 		},
 		clean: {
 			test: {
-				src: ["test/expected"]
+				src: ["test/expected/*.scss", "test/expected/*.css"]
 			}
 		},
 		nodeunit: {

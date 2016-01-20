@@ -34,7 +34,7 @@
   };
 
   _write = function(files, cwd, dest, cb) {
-    var file, rendered;
+    var file, filename, rendered;
     rendered = ((function() {
       var _i, _len, _results;
       _results = [];
@@ -44,17 +44,11 @@
       }
       return _results;
     })()).join('\n');
-    return mkdirp(cwd, function(err) {
-      var filename;
-      if (err) {
-        throw err;
-      }
-      filename = "" + cwd + dest;
-      fs.writeFileSync(filename, rendered);
-      if (typeof cb === 'function') {
-        return cb.apply(null);
-      }
-    });
+    filename = "" + cwd + dest;
+    fs.writeFileSync(filename, rendered);
+    if (typeof cb === 'function') {
+      return cb.apply(null);
+    }
   };
 
   _spriteName = function(options) {

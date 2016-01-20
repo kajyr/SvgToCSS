@@ -25,14 +25,11 @@ _merge = (options, overrides) ->
 _write = (files, cwd, dest, cb) ->
 	rendered = (for file in files
 				file.render()).join('\n')
-
-	mkdirp(cwd, (err) ->
-		throw err if err
-
-		filename = "#{cwd}#{dest}"
-		fs.writeFileSync(filename, rendered)
-		cb.apply(null) if typeof cb == 'function'
-	)
+	
+	filename = "#{cwd}#{dest}"
+	fs.writeFileSync(filename, rendered)
+	cb.apply(null) if typeof cb == 'function'
+	
 
 _spriteName = (options) ->
 	return options.sprite if options.sprite?
