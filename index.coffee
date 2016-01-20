@@ -1,6 +1,5 @@
 fs = require 'fs'
 path = require 'path'
-mkdirp = require 'mkdirp'
 Mustache = 	require 'mustache'
 {parseString} = require 'xml2js'
 
@@ -25,7 +24,7 @@ _merge = (options, overrides) ->
 _write = (files, cwd, dest, cb) ->
 	rendered = (for file in files
 				file.render()).join('\n')
-	
+
 	filename = "#{cwd}#{dest}"
 	fs.writeFileSync(filename, rendered)
 	cb.apply(null) if typeof cb == 'function'
