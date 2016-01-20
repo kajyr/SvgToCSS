@@ -1,11 +1,9 @@
 (function() {
-  var Mustache, SVGFile, defaults, fs, mkdirp, parseString, path, _extend, _merge, _spriteName, _write;
+  var Mustache, SVGFile, defaults, fs, parseString, path, _extend, _merge, _spriteName, _write;
 
   fs = require('fs');
 
   path = require('path');
-
-  mkdirp = require('mkdirp');
 
   Mustache = require('mustache');
 
