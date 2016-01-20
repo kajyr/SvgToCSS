@@ -1,6 +1,6 @@
 {
   "name": "svgtocss",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "Converts SVG files and embed them into CSS / SASS",
   "main": "svg2css.js",
   "scripts": {
