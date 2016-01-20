@@ -1,5 +1,4 @@
 node_modules
-test/expected
 manual.test.js
 
 npm-debug.log
