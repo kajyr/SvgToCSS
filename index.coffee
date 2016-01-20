@@ -1,5 +1,6 @@
 fs = require 'fs'
 path = require 'path'
+mkdirp = require 'mkdirp'
 fsp = require 'fs-promise'
 Mustache = 	require 'mustache'
 {parseString} = require 'xml2js'
@@ -13,6 +14,14 @@ defaults = {
 	spriteFileName: 'svg'
 	style: 'css'
 }
+
+pmkdirp = (dir) ->
+	new Promise (resolve, reject) ->
+		mkdirp(dir, (error) ->
+			return reject(error) if (error)
+			return resolve(dir)
+		)
+
 
 _extend = (object, properties) ->
 	for key, val of properties
@@ -28,7 +37,9 @@ getTemplate = (options) ->
 		else options.templateCSS
 	 'utf8')
 
-write = (rendered, cwd, dest) -> fsp.writeFile("#{cwd}#{dest}", rendered).then(() -> return rendered)
+write = (rendered, cwd, dest) ->
+ 	pmkdirp(cwd).then(() -> fsp.writeFile("#{cwd}#{dest}", rendered).then(() -> return rendered) )
+	
 
 spriteName = (options) ->
 	return options.sprite if options.sprite?

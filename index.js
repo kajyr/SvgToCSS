@@ -1,9 +1,11 @@
 (function() {
-  var Mustache, addMeasurements, defaults, encode, fs, fsp, getTemplate, parseString, path, readFile, render, spriteName, write, _extend, _merge;
+  var Mustache, addMeasurements, defaults, encode, fs, fsp, getTemplate, mkdirp, parseString, path, pmkdirp, readFile, render, spriteName, write, _extend, _merge;
 
   fs = require('fs');
 
   path = require('path');
+
+  mkdirp = require('mkdirp');
 
   fsp = require('fs-promise');
 
@@ -18,6 +20,17 @@
     templateSCSS: "" + __dirname + "/templateSCSS.mst",
     spriteFileName: 'svg',
     style: 'css'
+  };
+
+  pmkdirp = function(dir) {
+    return new Promise(function(resolve, reject) {
+      return mkdirp(dir, function(error) {
+        if (error) {
+          return reject(error);
+        }
+        return resolve(dir);
+      });
+    });
   };
 
   _extend = function(object, properties) {
@@ -38,8 +51,10 @@
   };
 
   write = function(rendered, cwd, dest) {
-    return fsp.writeFile("" + cwd + dest, rendered).then(function() {
-      return rendered;
+    return pmkdirp(cwd).then(function() {
+      return fsp.writeFile("" + cwd + dest, rendered).then(function() {
+        return rendered;
+      });
     });
   };
 
