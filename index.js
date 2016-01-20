@@ -1,9 +1,11 @@
 (function() {
-  var Mustache, SVGFile, defaults, fs, parseString, path, _extend, _merge, _spriteName, _write;
+  var Mustache, addMeasurements, defaults, encode, fs, fsp, getTemplate, parseString, path, readFile, render, spriteName, write, _extend, _merge;
 
   fs = require('fs');
 
   path = require('path');
+
+  fsp = require('fs-promise');
 
   Mustache = require('mustache');
 
@@ -31,104 +33,80 @@
     return _extend(_extend({}, options), overrides);
   };
 
-  _write = function(files, cwd, dest, cb) {
-    var file, filename, rendered;
-    rendered = ((function() {
-      var _i, _len, _results;
-      _results = [];
-      for (_i = 0, _len = files.length; _i < _len; _i++) {
-        file = files[_i];
-        _results.push(file.render());
-      }
-      return _results;
-    })()).join('\n');
-    filename = "" + cwd + dest;
-    fs.writeFileSync(filename, rendered);
-    if (typeof cb === 'function') {
-      return cb.apply(null);
-    }
+  getTemplate = function(options) {
+    return fsp.readFile(options.style.toLowerCase() === 'scss' ? options.templateSCSS : options.templateCSS, 'utf8');
   };
 
-  _spriteName = function(options) {
-    var ext;
+  write = function(rendered, cwd, dest) {
+    return fsp.writeFile("" + cwd + dest, rendered).then(function() {
+      return rendered;
+    });
+  };
+
+  spriteName = function(options) {
     if (options.sprite != null) {
       return options.sprite;
     }
-    ext = options.style.toLowerCase();
-    return options.spriteFileName + '.' + ext;
+    return options.spriteFileName + '.' + options.style.toLowerCase();
   };
 
-  SVGFile = (function() {
-    function SVGFile(name, data, options) {
-      this.name = name;
-      this.data = data;
-      this.options = options;
-      this.encoded = this._encode();
-      parseString(this.data, (function(_this) {
+  render = function(files, template) {
+    return Mustache.render(template, {
+      files: files
+    });
+  };
+
+  addMeasurements = function(file) {
+    return new Promise(function(resolve, reject) {
+      return parseString(file.data, (function(_this) {
         return function(err, result) {
-          _this.width = result.svg.$.width;
-          return _this.height = result.svg.$.height;
+          file.width = result.svg.$.width;
+          file.height = result.svg.$.height;
+          return resolve(file);
         };
       })(this));
+    });
+  };
+
+  encode = function(data, base64) {
+    if (base64 === true) {
+      return new Buffer(data).toString('base64');
     }
+    return encodeURIComponent(data);
+  };
 
-    SVGFile.fromFile = function(filename, options) {
-      var data, name;
-      data = fs.readFileSync(filename, 'utf8');
-      name = path.basename(filename, '.svg');
-      return new SVGFile(name, data, options);
-    };
-
-    SVGFile.prototype._encode = function() {
-      if (this.options.base64 === true) {
-        return new Buffer(this.data).toString('base64');
-      }
-      return encodeURIComponent(this.data);
-    };
-
-    SVGFile.prototype.template = function() {
-      var style;
-      style = this.options.style.toLowerCase();
-      return fs.readFileSync(style === 'scss' ? this.options.templateSCSS : this.options.templateCSS, 'utf8');
-    };
-
-    SVGFile.prototype.render = function() {
-      return Mustache.render(this.template(), {
-        svgName: this.name,
-        svgEncoded: this.encoded,
-        base64: this.options.base64 === true,
-        width: this.width,
-        height: this.height
-      });
-    };
-
-    return SVGFile;
-
-  })();
+  readFile = function(filename, base64) {
+    return fsp.readFile(filename, 'utf8').then(function(data) {
+      return {
+        name: path.basename(filename, '.svg'),
+        data: data,
+        encoded: encode(data, base64),
+        base64: base64
+      };
+    }).then(addMeasurements);
+  };
 
   module.exports = {
     defaults: defaults,
-    encode: function(files, params, callback) {
-      var file, options, spriteName, svgFiles;
+    encode: function(files, params) {
+      var file, options;
       options = _merge(defaults, params);
-      spriteName = _spriteName(options);
-      svgFiles = (function() {
+      return Promise.all((function() {
         var _i, _len, _ref, _results;
         _ref = [].concat(files);
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           file = _ref[_i];
-          _results.push(SVGFile.fromFile(file, options));
+          _results.push(readFile(file, options.base64));
         }
         return _results;
-      })();
-      return _write(svgFiles, options.cwd, spriteName, callback);
-    },
-    encodeString: function(svgName, svgData, params, callback) {
-      var file, options;
-      options = _merge(defaults, params);
-      file = new SVGFile(svgName, svgData, options);
-      return _write([file], options.cwd, file.name + '.css', callback);
+      })()).then(function(files) {
+        return getTemplate(options).then(function(template) {
+          return render(files, template);
+        });
+      }).then(function(rendered) {
+        return write(rendered, options.cwd, spriteName(options));
+      });
     }
   };
 

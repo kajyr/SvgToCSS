@@ -15,7 +15,7 @@ exports.multiFileEncodeSass = function (test) {
 		cwd: cssDir,
 		style: 'scss',
 		sprite: file
-	}, function() {
+	}).then(function() {
 		fs.exists(expectedSASS, function (exists) {
 			test.ok(exists, 'There should be the SASS file');
 			test.done();
@@ -30,9 +30,27 @@ exports.encodeSassWithoutFileName = function (test) {
 	svg2css.encode(svgFixture, {
 		cwd: cssDir,
 		style: 'scss',
-	}, function() {
+	}).then(function() {
 		fs.exists(expectedSCSS, function (exists) {
 			test.ok(exists, 'There should be the SASS file: ' + expectedSCSS);
+			test.done();
+		});
+	})
+}
+
+
+exports.multiFileEncodeSassB64 = function (test) {
+	var file = '_svgPartialB64.scss';
+	var expectedSASS = cssDir + file;
+
+	svg2css.encode([svgFixture, svgFixture2], {
+		cwd: cssDir,
+		style: 'scss',
+		sprite: file,
+		base64: true
+	}).then(function() {
+		fs.exists(expectedSASS, function (exists) {
+			test.ok(exists, 'There should be the SASS file');
 			test.done();
 		});
 	})

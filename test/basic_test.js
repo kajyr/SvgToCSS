@@ -8,30 +8,10 @@ var cssDir = './test/expected/';
 var expectedCSS = cssDir + '/svg.css';
 
 
-exports.fileFromString = function (test) {
-
-	var svgName = 'testFileFromString';
-	
-	var expectedCSS = cssDir + svgName + '.css';
-   
-	var fileContents = fs.readFileSync(svgFixture2, 'utf8');
-
-	svg2css.encodeString(svgName, fileContents, {
-		cwd: cssDir
-	}, function () {
-		
-		fs.exists(expectedCSS, function (exists) {
-			test.ok(exists, 'There should be the css file');
-			test.done();
-		});
-
-	})
-}
-
 exports.fileEncode = function (test) {	
 	svg2css.encode(svgFixture, {
 		cwd: cssDir
-	}, function() {
+	}).then(function() {
 		fs.exists(expectedCSS, function (exists) {
 			test.ok(exists, 'There should be the css file');
 			test.done();
@@ -42,10 +22,11 @@ exports.fileEncode = function (test) {
 exports.multiFileEncode = function (test) {	
 	svg2css.encode([svgFixture, svgFixture2], {
 		cwd: cssDir
-	}, function() {
+	}).then(function() {
 		fs.exists(expectedCSS, function (exists) {
 			test.ok(exists, 'There should be the css file');
 			test.done();
 		});
 	})
 }
+

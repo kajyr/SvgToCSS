@@ -1,5 +1,6 @@
 fs = require 'fs'
 path = require 'path'
+fsp = require 'fs-promise'
 Mustache = 	require 'mustache'
 {parseString} = require 'xml2js'
 
@@ -21,74 +22,61 @@ _extend = (object, properties) ->
 _merge = (options, overrides) ->
   _extend ( _extend {}, options), overrides
 
-_write = (files, cwd, dest, cb) ->
-	rendered = (for file in files
-				file.render()).join('\n')
+getTemplate = (options) ->
+	fsp.readFile(
+		if options.style.toLowerCase() == 'scss' then options.templateSCSS
+		else options.templateCSS
+	 'utf8')
 
-	filename = "#{cwd}#{dest}"
-	fs.writeFileSync(filename, rendered)
-	cb.apply(null) if typeof cb == 'function'
-	
+write = (rendered, cwd, dest) -> fsp.writeFile("#{cwd}#{dest}", rendered).then(() -> return rendered)
 
-_spriteName = (options) ->
+spriteName = (options) ->
 	return options.sprite if options.sprite?
-	ext = options.style.toLowerCase()
-	options.spriteFileName + '.' + ext
+	options.spriteFileName + '.' + options.style.toLowerCase()
 
-class SVGFile
-	constructor: (@name, @data, @options) ->
-		@encoded = @_encode()
-		parseString(@data, (err, result) =>
-			@width = result.svg.$.width
-			@height = result.svg.$.height
+render = (files, template) -> Mustache.render(template, { files: files })
+
+addMeasurements = (file) ->
+	new Promise (resolve, reject) ->
+		parseString(file.data, (err, result) =>
+			file.width = result.svg.$.width
+			file.height = result.svg.$.height
+			resolve file
 		)
 
-	@fromFile: (filename, options) ->
-		data = fs.readFileSync(filename, 'utf8')
-		name = path.basename(filename, '.svg')
-		new SVGFile(name, data, options)
+encode = (data, base64) ->
+	if base64 == true
+		return new Buffer(data).toString('base64')
+	return encodeURIComponent(data)
 
-	_encode: () ->
-		if @options.base64 == true
-			return new Buffer(@data).toString('base64')
-		return encodeURIComponent(@data)
 
-	template: () ->
-		style = @options.style.toLowerCase()
-		fs.readFileSync(
-			if style == 'scss' then @options.templateSCSS
-			else @options.templateCSS
-		 'utf8')
-
-	render: () ->
-		Mustache.render(@template(), {
-			svgName: @name,
-			svgEncoded: @encoded
-			base64: @options.base64 == true
-			width: @width
-			height: @height
-		})
+readFile = (filename, base64) ->
+	fsp.readFile(filename, 'utf8').then((data) ->
+		return {
+			name: path.basename(filename, '.svg')
+			data: data
+			encoded: encode(data, base64)
+			base64: base64
+		}
+	).then(addMeasurements)
 
 
 module.exports = {
 
 	defaults: defaults
 
-	encode: (files, params, callback) ->
+	encode: (files, params) ->
 
 		options = _merge(defaults, params)
 
-		spriteName = _spriteName(options)
+		Promise.all(readFile(file, options.base64) for file in [].concat(files))
+		.then( (files) ->
+			getTemplate(options)
+			.then((template) ->
+				render(files, template)
+			)
+		).then((rendered) ->
+			write(rendered, options.cwd, spriteName(options))
+		)
 
-		svgFiles = for file in [].concat(files)
-			SVGFile.fromFile(file, options)
-
-		_write(svgFiles, options.cwd, spriteName, callback)
-
-	encodeString: (svgName, svgData, params, callback) ->
-		options = _merge(defaults, params)
-
-		file = new SVGFile(svgName, svgData, options)
-
-		_write([file], options.cwd, file.name + '.css', callback)
 }
