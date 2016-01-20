@@ -72,6 +72,8 @@ class SVGFile
 
 module.exports = {
 
+	defaults: defaults
+
 	encode: (files, params, callback) ->
 
 		options = _merge(defaults, params)

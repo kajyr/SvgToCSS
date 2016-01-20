@@ -107,6 +107,7 @@
   })();
 
   module.exports = {
+    defaults: defaults,
     encode: function(files, params, callback) {
       var file, options, spriteName, svgFiles;
       options = _merge(defaults, params);
