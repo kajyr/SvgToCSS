@@ -47,11 +47,15 @@ spriteName = (options) ->
 
 render = (files, template) -> Mustache.render(template, { files: files })
 
+fixAppendix = (string) ->
+	return string if not string.indexOf("px") > -1
+	string.slice(0,string.lastIndexOf("px"))
+
 addMeasurements = (file) ->
 	new Promise (resolve, reject) ->
 		parseString(file.data, (err, result) =>
-			file.width = result.svg.$.width
-			file.height = result.svg.$.height
+			file.width = fixAppendix(result.svg.$.width)
+			file.height = fixAppendix(result.svg.$.height)
 			resolve file
 		)
 
