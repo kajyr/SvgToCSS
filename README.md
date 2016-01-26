@@ -1,5 +1,7 @@
 # SvgToCSS
 
+[![Build Status](https://travis-ci.org/kajyr/SvgToCSS.svg?branch=master)](https://travis-ci.org/kajyr/SvgToCSS)
+
 The idea behind this module came from the work made for [aditollo/grunt-svgzr](https://github.com/aditollo/grunt-svgzr) and the [probably-dont-base64-svg](http://css-tricks.com/probably-dont-base64-svg/) article
 
 I've decided to separate the URI / base64 svg renderer to generate CSS / SCSS sprites from SVG files.
