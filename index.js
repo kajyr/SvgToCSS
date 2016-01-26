@@ -1,5 +1,5 @@
 (function() {
-  var Mustache, addMeasurements, defaults, encode, fs, fsp, getTemplate, mkdirp, parseString, path, pmkdirp, readFile, render, spriteName, write, _extend, _merge;
+  var Mustache, addMeasurements, defaults, encode, fixAppendix, fs, fsp, getTemplate, mkdirp, parseString, path, pmkdirp, readFile, render, spriteName, write, _extend, _merge;
 
   fs = require('fs');
 
@@ -71,12 +71,19 @@
     });
   };
 
+  fixAppendix = function(string) {
+    if (!string.indexOf("px") > -1) {
+      return string;
+    }
+    return string.slice(0, string.lastIndexOf("px"));
+  };
+
   addMeasurements = function(file) {
     return new Promise(function(resolve, reject) {
       return parseString(file.data, (function(_this) {
         return function(err, result) {
-          file.width = result.svg.$.width;
-          file.height = result.svg.$.height;
+          file.width = fixAppendix(result.svg.$.width);
+          file.height = fixAppendix(result.svg.$.height);
           return resolve(file);
         };
       })(this));

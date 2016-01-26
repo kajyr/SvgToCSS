@@ -3,8 +3,8 @@
 }
 
 {{#files}}
-${{name}}-width: {{width}};
-${{name}}-height: {{height}};
+${{name}}-width: {{width}}px;
+${{name}}-height: {{height}}px;
 
 .svg-{{name}} {
 	background-image: url('data:image/svg+xml;charset=utf-8{{#base64}};base64{{/base64}},{{encoded}}');
