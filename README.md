@@ -21,6 +21,7 @@ This task would have created a css file like this
 .svg-file1 {
 	background-image: url('data:image/svg+xml;charset=utf-8, ...');
 }
+
 .svg-file2 {
 	background-image: url('data:image/svg+xml;charset=utf-8, ... ');
 }
