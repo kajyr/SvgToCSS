@@ -4,7 +4,7 @@
   "description": "Converts SVG files and embed them into CSS / SASS",
   "main": "svg2css.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "nodeunit"
   },
   "author": {
     "name": "Carlo 'kj'",
