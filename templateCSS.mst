@@ -3,7 +3,11 @@
 .svg-{{name}} {
 	background-image: url('data:image/svg+xml;charset=utf-8{{#base64}};base64{{/base64}},{{encoded}}');
 	background-repeat: no-repeat;
-	width: {{width}}px;
-	height: {{height}}px;
+	{{#width}}
+		width: {{width}}px;
+	{{/width}}
+	{{#height}}
+		height: {{height}}px;
+	{{/height}}
 }
 {{/files}}

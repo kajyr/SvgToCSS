@@ -3,6 +3,7 @@ var fs = require('fs');
 
 var svgFixture = './test/fixtures/iconmonstr-barcode-4-icon.svg';
 var svgFixture2 = './test/fixtures/iconmonstr-puzzle-2-icon.svg';
+var svgFixture3 = './test/fixtures/iconmonstr-puzzle-2-icon-adimensional.svg';
 
 var cssDir = './test/expected/';
 
@@ -11,7 +12,7 @@ exports.multiFileEncodeSass = function (test) {
 	var file = '_svgPartial.scss';
 	var expectedSASS = cssDir + file;
 
-	svg2css.encode([svgFixture, svgFixture2], {
+	svg2css.encode([svgFixture, svgFixture2, svgFixture3], {
 		cwd: cssDir,
 		style: 'scss',
 		sprite: file
@@ -43,7 +44,7 @@ exports.multiFileEncodeSassB64 = function (test) {
 	var file = '_svgPartialB64.scss';
 	var expectedSASS = cssDir + file;
 
-	svg2css.encode([svgFixture, svgFixture2], {
+	svg2css.encode([svgFixture, svgFixture2, svgFixture3], {
 		cwd: cssDir,
 		style: 'scss',
 		sprite: file,

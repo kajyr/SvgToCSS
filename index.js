@@ -72,7 +72,7 @@
   };
 
   fixAppendix = function(string) {
-    if (!string.indexOf("px") > -1) {
+    if (string.indexOf("px") === -1) {
       return string;
     }
     return string.slice(0, string.lastIndexOf("px"));
@@ -82,8 +82,10 @@
     return new Promise(function(resolve, reject) {
       return parseString(file.data, (function(_this) {
         return function(err, result) {
-          file.width = fixAppendix(result.svg.$.width);
-          file.height = fixAppendix(result.svg.$.height);
+          if (result.svg.$.width && result.svg.$.height) {
+            file.width = fixAppendix(result.svg.$.width);
+            file.height = fixAppendix(result.svg.$.height);
+          }
           return resolve(file);
         };
       })(this));

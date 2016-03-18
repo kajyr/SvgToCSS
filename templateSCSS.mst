@@ -3,13 +3,21 @@
 }
 
 {{#files}}
-${{name}}-width: {{width}}px;
-${{name}}-height: {{height}}px;
+	{{#width}}
+		${{name}}-width: {{.}}px;
+	{{/width}}
+	{{#height}}
+		${{name}}-height: {{.}}px;
+	{{/height}}
 
-.svg-{{name}} {
-	background-image: url('data:image/svg+xml;charset=utf-8{{#base64}};base64{{/base64}},{{encoded}}');
-	width: ${{name}}-width;
-	height: ${{name}}-height;
-	@extend %svg-common-style;
-}
+	.svg-{{name}} {
+		background-image: url('data:image/svg+xml;charset=utf-8{{#base64}};base64{{/base64}},{{encoded}}');
+		{{#width}}
+			width: ${{name}}-width;
+		{{/width}}
+		{{#height}}
+			height: ${{name}}-height;
+		{{/height}}
+		@extend %svg-common-style;
+	}
 {{/files}}
