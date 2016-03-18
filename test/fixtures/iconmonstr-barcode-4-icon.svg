@@ -4,7 +4,7 @@
 
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="512px" height="512px" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
+	 width="256" height="256" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
 <path id="barcode-4-icon" fill-rule="evenodd" clip-rule="evenodd" d="M117,331.114V181.956h23.215v149.158H117z M162.318,331.114
 	V181.956h27.75v149.158H162.318z M211.979,331.114V181.956h13.611v149.16L211.979,331.114z M297.614,331.114V181.956h13.61v149.16
 	L297.614,331.114z M247.827,331.114l-0.001-149.158h27.749v149.16L247.827,331.114z M333.566,331.114v-149.16h23.217v149.16H333.566
