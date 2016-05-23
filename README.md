@@ -10,7 +10,7 @@ I've decided to separate the URI / base64 svg renderer to generate CSS / SCSS sp
 ```javascript
 var svgtocss = require('svgtocss');
 
-svgtocss.encode(['file1.svg', 'file2.svg'], options, function() {
+svgtocss.encode(['file1.svg', 'file2.svg'], options).then(function() {
 	console.log('all done!');
 })
 ```
